@@ -1,0 +1,6 @@
+{
+  "name": "Tower",
+  "description": "Isometric 3D block stacking tower builder game with multiple difficulties and high scores.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

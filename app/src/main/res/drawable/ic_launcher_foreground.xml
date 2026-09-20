@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Isometric Tower Stack within 66dp safe zone (21 to 87) -->
+    <!-- Base Block (Coral/Pink) -->
+    <!-- Top Face: 54,62 to 74,72 to 54,82 to 34,72 -->
+    <!-- Left Face: 34,72 to 54,82 to 54,92 to 34,82 -->
+    <!-- Right Face: 54,82 to 74,72 to 74,82 to 54,92 -->
+    <path
+        android:fillColor="#E06D85"
+        android:pathData="M54,62 L74,72 L54,82 L34,72 Z" />
+    <path
+        android:fillColor="#C64765"
+        android:pathData="M34,72 L54,82 L54,92 L34,82 Z" />
+    <path
+        android:fillColor="#9E2F49"
+        android:pathData="M54,82 L74,72 L74,82 L54,92 Z" />
+
+    <!-- Middle Block (Warm Peach/Gold) -->
+    <path
+        android:fillColor="#F4A261"
+        android:pathData="M54,46 L72,55 L54,64 L36,55 Z" />
+    <path
+        android:fillColor="#E76F51"
+        android:pathData="M36,55 L54,64 L54,74 L36,65 Z" />
+    <path
+        android:fillColor="#C24E33"
+        android:pathData="M54,64 L72,55 L72,65 L54,74 Z" />
+
+    <!-- Top Block (Mint Green) -->
+    <path
+        android:fillColor="#7ED9A4"
+        android:pathData="M54,30 L70,38 L54,46 L38,38 Z" />
+    <path
+        android:fillColor="#48C77E"
+        android:pathData="M38,38 L54,46 L54,56 L38,48 Z" />
+    <path
+        android:fillColor="#2A9D60"
+        android:pathData="M54,46 L70,38 L70,48 L54,56 Z" />
+
+    <!-- Shiny Crown on Top Block -->
+    <path
+        android:fillColor="#FFDD53"
+        android:pathData="M48,22 L51,27 L54,20 L57,27 L60,22 L60,28 L48,28 Z" />
+</vector>
+
