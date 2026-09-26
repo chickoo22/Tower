@@ -121,7 +121,7 @@ class TowerEngine(
         movingSizeY = initialSize
         movingZTop = blockHeight
         movingColor = ColorPaletteGenerator.getColorForLayer(1, currentTheme)
-        baseTravelRange = initialSize * 1.15f + 30f
+        baseTravelRange = initialSize * 1.08f + 20f
         oscillationPhase = -Math.PI.toFloat() / 2f
         movingOffset = -baseTravelRange
 
@@ -525,7 +525,7 @@ class TowerEngine(
         val currentFloor = _score.value + 1
         movingColor = ColorPaletteGenerator.getColorForLayer(currentFloor, currentTheme)
 
-        baseTravelRange = (if (movingAxis == Axis.X) topBlock.sizeX else topBlock.sizeY) * 1.25f + 32f
+        baseTravelRange = (if (movingAxis == Axis.X) topBlock.sizeX else topBlock.sizeY) * 1.10f + 20f
         oscillationPhase = -Math.PI.toFloat() / 2f
         movingOffset = -baseTravelRange
     }
@@ -533,9 +533,9 @@ class TowerEngine(
     // Called on every frame (60fps loop)
     fun update(deltaTimeFraction: Float) {
         if (_gamePhase.value == GamePhase.Playing) {
-            // Harmonic sinusoidal gliding: calibrated to match reference video (~1.05s half-period)
-            val baseFrequency = 2.95f // rad/s (~1.06s sweep)
-            val heightBonus = (_score.value * 0.015f).coerceAtMost(0.9f)
+            // Harmonic sinusoidal gliding: comfortable and responsive (~1.46s half-period)
+            val baseFrequency = 2.15f // rad/s (~1.46s sweep, comfortable reaction time)
+            val heightBonus = (_score.value * 0.010f).coerceAtMost(0.70f)
             val angularFrequency = baseFrequency + heightBonus
             oscillationPhase += angularFrequency * deltaTimeFraction
             movingOffset = baseTravelRange * sin(oscillationPhase)

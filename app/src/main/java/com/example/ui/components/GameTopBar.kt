@@ -1,5 +1,9 @@
 package com.example.ui.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,12 +23,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -32,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.engine.DifficultyMode
+import kotlinx.coroutines.delay
 
 @Composable
 fun GameTopBar(
@@ -44,6 +58,31 @@ fun GameTopBar(
     @Suppress("UNUSED_PARAMETER") currentMode: DifficultyMode = DifficultyMode.HARD
 ) {
     val displayBest = maxOf(score, allTimeBest)
+
+    // Animated score punch on increment
+    var lastScore by remember { mutableIntStateOf(score) }
+    var punchTrigger by remember { mutableStateOf(false) }
+
+    LaunchedEffect(score) {
+        if (score > lastScore) {
+            punchTrigger = true
+            lastScore = score
+            delay(140)
+            punchTrigger = false
+        } else {
+            lastScore = score
+        }
+    }
+
+    val scoreScale by animateFloatAsState(
+        targetValue = if (punchTrigger) 1.25f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "score_pop_anim"
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -51,10 +90,11 @@ fun GameTopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left: Circular White Back Button (<) matching reference screenshot
+        // Left: Circular White Back Button (<)
         Box(
             modifier = Modifier
-                .size(46.dp)
+                .size(48.dp)
+                .shadow(6.dp, shape = CircleShape, spotColor = Color(0x4D000000))
                 .clip(CircleShape)
                 .background(Color.White)
                 .clickable(onClick = onBack)
@@ -64,14 +104,14 @@ fun GameTopBar(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                 contentDescription = "Back",
-                tint = Color(0xFF222B38),
+                tint = Color(0xFF1E293B),
                 modifier = Modifier
-                    .size(19.dp)
+                    .size(20.dp)
                     .padding(end = 2.dp)
             )
         }
 
-        // Center: Two Dark Rounded Badges (SCORE & THIS WEEK High Score)
+        // Center: Two Dark Glassmorphic Badges (SCORE & BEST HIGH SCORE)
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -79,58 +119,117 @@ fun GameTopBar(
             // Current Score badge
             Box(
                 modifier = Modifier
-                    .width(108.dp)
-                    .height(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF161129).copy(alpha = 0.88f))
-                    .border(1.dp, Color.White.copy(alpha = 0.10f), RoundedCornerShape(14.dp))
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                    .width(116.dp)
+                    .height(52.dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(16.dp), spotColor = Color(0x55000000))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color(0xFF1E1738).copy(alpha = 0.94f),
+                                Color(0xFF0F0B1E).copy(alpha = 0.97f)
+                            )
+                        )
+                    )
+                    .border(
+                        BorderStroke(
+                            1.2.dp,
+                            Brush.verticalGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.28f),
+                                    Color.White.copy(alpha = 0.08f)
+                                )
+                            )
+                        ),
+                        RoundedCornerShape(16.dp)
+                    )
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        text = "SCORE",
-                        color = Color.White.copy(alpha = 0.80f),
-                        fontSize = 10.5.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 0.8.sp
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = Color(0xFFA5B4FC),
+                            modifier = Modifier.size(10.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = "SCORE",
+                            color = Color(0xFFC7D2FE),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.2.sp
+                        )
+                    }
                     Text(
                         text = "$score",
                         color = Color.White,
-                        fontSize = 22.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Black,
-                        lineHeight = 23.sp
+                        lineHeight = 25.sp,
+                        modifier = Modifier.scale(scoreScale)
                     )
                 }
             }
 
-            // High Score badge with Crown and Vibrant Pink text matching reference screenshot
+            // High Score badge with Trophy and Vibrant Record accent
             Box(
                 modifier = Modifier
-                    .width(108.dp)
-                    .height(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF161129).copy(alpha = 0.88f))
-                    .then(
-                        if (isNewRecord) Modifier.background(
-                            Brush.linearGradient(
+                    .width(116.dp)
+                    .height(52.dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(16.dp), spotColor = Color(0x55000000))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        if (isNewRecord) {
+                            Brush.verticalGradient(
                                 listOf(
-                                    Color(0xFFFF4081).copy(alpha = 0.35f),
-                                    Color(0xFFFFD700).copy(alpha = 0.35f)
+                                    Color(0xFF382305).copy(alpha = 0.95f),
+                                    Color(0xFF1F1102).copy(alpha = 0.98f)
                                 )
                             )
-                        ) else Modifier
+                        } else {
+                            Brush.verticalGradient(
+                                listOf(
+                                    Color(0xFF28132A).copy(alpha = 0.94f),
+                                    Color(0xFF130917).copy(alpha = 0.97f)
+                                )
+                            )
+                        }
                     )
                     .border(
-                        1.dp,
-                        if (isNewRecord) Color(0xFFFFD700).copy(alpha = 0.7f) else Color.White.copy(alpha = 0.10f),
-                        RoundedCornerShape(14.dp)
+                        if (isNewRecord) {
+                            BorderStroke(
+                                1.5.dp,
+                                Brush.linearGradient(
+                                    listOf(
+                                        Color(0xFFFFD700),
+                                        Color(0xFFFF9100),
+                                        Color(0xFFFFD700)
+                                    )
+                                )
+                            )
+                        } else {
+                            BorderStroke(
+                                1.2.dp,
+                                Brush.verticalGradient(
+                                    listOf(
+                                        Color(0xFFFF4081).copy(alpha = 0.45f),
+                                        Color.White.copy(alpha = 0.10f)
+                                    )
+                                )
+                            )
+                        },
+                        RoundedCornerShape(16.dp)
                     )
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -149,28 +248,29 @@ fun GameTopBar(
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = if (isNewRecord) "NEW RECORD" else "THIS WEEK",
-                            color = if (isNewRecord) Color(0xFFFFD700) else Color(0xFFFF4081),
-                            fontSize = 9.5.sp,
+                            text = if (isNewRecord) "NEW RECORD" else "BEST",
+                            color = if (isNewRecord) Color(0xFFFFE066) else Color(0xFFFF7597),
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Black,
-                            letterSpacing = 0.5.sp
+                            letterSpacing = 0.8.sp
                         )
                     }
                     Text(
                         text = "$displayBest",
-                        color = if (isNewRecord) Color(0xFFFFD700) else Color(0xFFFF4081),
-                        fontSize = 22.sp,
+                        color = if (isNewRecord) Color(0xFFFFD700) else Color(0xFFFF7597),
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Black,
-                        lineHeight = 23.sp
+                        lineHeight = 25.sp
                     )
                 }
             }
         }
 
-        // Right: Circular White Reload/Restart Button (⟳) matching reference screenshot
+        // Right: Circular White Reload/Restart Button (⟳)
         Box(
             modifier = Modifier
-                .size(46.dp)
+                .size(48.dp)
+                .shadow(6.dp, shape = CircleShape, spotColor = Color(0x4D000000))
                 .clip(CircleShape)
                 .background(Color.White)
                 .clickable(onClick = onRestart)
@@ -180,7 +280,7 @@ fun GameTopBar(
             Icon(
                 imageVector = Icons.Filled.Refresh,
                 contentDescription = "Restart",
-                tint = Color(0xFF222B38),
+                tint = Color(0xFF1E293B),
                 modifier = Modifier.size(24.dp)
             )
         }
